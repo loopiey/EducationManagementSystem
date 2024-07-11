@@ -10,6 +10,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        //Error here
         services.AddDbContext<EMSContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
         services.AddControllers();
