@@ -1,4 +1,7 @@
 using EMS.Persistance;
+using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+
 public class Startup
 {
     public IConfiguration Configuration { get; }
