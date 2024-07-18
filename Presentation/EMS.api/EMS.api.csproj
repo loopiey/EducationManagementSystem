@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\EMS.Application\EMS.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\EMS.Persistance\EMS.Persistance.csproj" />
   </ItemGroup>
 
