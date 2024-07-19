@@ -1,8 +1,8 @@
 ﻿namespace EMS.Domain.Common
 {
-    public class EntityBase : IEntityBase
+    public class EntityBase
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public DateTime CreateTime { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
     }
