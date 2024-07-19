@@ -1,5 +1,5 @@
-﻿using EMS.Application.Abstractions;
-using EMS.Persistance.Concrete;
+﻿using EMS.Persistance.Contexts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -12,9 +12,9 @@ namespace EMS.Persistance
 {
     public static class ServiceRegistration
     {
-        public static void AddPersistanceService(this IServiceCollection services)
+        public static void AddPersistanceService(this IServiceCollection services, string connectionString)
         {
-            services.AddSingleton<IUserService, UserService>();
+            services.AddDbContext<EMSDbContext>(options => options.UseNpgsql(connectionString));
         }
     }
 }

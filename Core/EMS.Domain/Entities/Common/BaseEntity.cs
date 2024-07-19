@@ -1,6 +1,6 @@
 ﻿namespace EMS.Domain.Common
 {
-    public class EntityBase
+    public class BaseEntity
     {
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; } = DateTime.Now;

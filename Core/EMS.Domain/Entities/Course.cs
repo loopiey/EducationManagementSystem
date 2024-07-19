@@ -2,7 +2,7 @@
 
 namespace EMS.Domain.Entities
 {
-    public class Course : EntityBase
+    public class Course : BaseEntity
     {
         public string? Name { get; set; }
         public string? Explanation { get; set; }
