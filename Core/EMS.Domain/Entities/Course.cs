@@ -1,4 +1,5 @@
 ﻿using EMS.Domain.Common;
+using EMS.Domain.Entities;
 
 namespace EMS.Domain.Entities
 {
@@ -9,6 +10,7 @@ namespace EMS.Domain.Entities
         public bool IsMandatory { get; set; }
         public int Credit { get; set; }
         public int TeacherId { get; set; }
-        public User? Teacher { get; set; }
+        public Teacher? Teacher { get; set; } // Navigation property
+        public ICollection<Student> Students { get; set; } = new List<Student>();
     }
 }

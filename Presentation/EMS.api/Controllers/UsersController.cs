@@ -69,7 +69,7 @@ namespace EMS.Api.Controllers
             existingUser.Surname = user.Surname;
             existingUser.Email = user.Email;
             existingUser.Phone = user.Phone;
-            existingUser.IsTeacher = user.IsTeacher;
+            existingUser.UserType = user.UserType;
 
             _userWriteRepo.UpdateAsync(existingUser);
             await _userWriteRepo.SaveAsync();
