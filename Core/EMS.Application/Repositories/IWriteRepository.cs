@@ -11,9 +11,9 @@ namespace EMS.Application.Repositories
     {
         Task<bool> AddAsync(T model);
         Task<bool> AddRangeAsync(List<T> data);
-        Task<bool> UpdateAsync(T model);
+        bool UpdateAsync(T model);
         bool Delete(T model);
-        bool Delete(string id);
+        Task<bool> DeleteAsync(string id);
         Task<int> SaveAsync();
     }
 }

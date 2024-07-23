@@ -38,19 +38,20 @@ namespace EMS.Persistance.Repositories
             return entityEntry.State == EntityState.Deleted;
         }
 
-        public bool Delete(string id)
+        public async Task<bool> DeleteAsync(string id)
         {
-            throw new NotImplementedException();
+            T model = await Table.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+            return Delete(model);
         }
 
-        public Task<int> SaveAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<int> SaveAsync()
+            => await _context.SaveChangesAsync();
+                 
 
-        public Task<bool> UpdateAsync(T model)
+        public bool UpdateAsync(T model)
         {
-            throw new NotImplementedException();
+            EntityEntry entityEntry = Table.Update(model);
+            return entityEntry.State == EntityState.Modified;
         }
     }
 }

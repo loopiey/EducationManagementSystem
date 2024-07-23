@@ -1,48 +1,53 @@
-﻿using EMS.Domain.Entities;
-using EMS.Persistance.Contexts;
-using Microsoft.AspNetCore.Http;
+﻿using EMS.Application.Repositories;
+using EMS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace EMS.api.Controllers
+namespace EMS.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly EMSDbContext _context;
-        public UsersController(EMSDbContext context)
+        private readonly IUserReadRepository _userReadRepo;
+        private readonly IUserWriteRepository _userWriteRepo;
+
+        public UsersController(IUserReadRepository userReadRepo, IUserWriteRepository userWriteRepo)
         {
-            _context = context;
+            _userReadRepo = userReadRepo;
+            _userWriteRepo = userWriteRepo;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _userReadRepo.GetAll().ToListAsync();
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<User>> GetUser(Guid id)
         {
-            var user = await _context.Users.FindAsync(id);
-
+            var user = await _userReadRepo.GetByIdAsync(id.ToString());
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return Ok(user);
         }
 
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(User user)
         {
             user.Id = Guid.NewGuid();  // Ensure a new Guid is generated for the user
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _userWriteRepo.AddAsync(user);
+            await _userWriteRepo.SaveAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         [HttpPut("{id}")]
@@ -53,39 +58,38 @@ namespace EMS.api.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            var existingUser = await _userReadRepo.GetByIdAsync(id.ToString());
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Users.Any(e => e.Id == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            // Update the properties of the existing user with the new values
+            existingUser.Name = user.Name;
+            existingUser.Surname = user.Surname;
+            existingUser.Email = user.Email;
+            existingUser.Phone = user.Phone;
+            existingUser.IsTeacher = user.IsTeacher;
+
+            _userWriteRepo.UpdateAsync(existingUser);
+            await _userWriteRepo.SaveAsync();
 
             return NoContent();
         }
 
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var user = await _context.Users.FindAsync(id);
-
+            var user = await _userReadRepo.GetByIdAsync(id.ToString());
             if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            //user.IsDeleted = true;
+            _userWriteRepo.Delete(user);
+            await _userWriteRepo.SaveAsync();
 
             return NoContent();
         }

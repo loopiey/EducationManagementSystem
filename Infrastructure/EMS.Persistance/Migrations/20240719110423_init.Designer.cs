@@ -13,7 +13,7 @@ namespace EMS.Persistance.Migrations
 {
     [DbContext(typeof(EMSDbContext))]
     [Migration("20240719110423_init")]
-    partial class init
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
