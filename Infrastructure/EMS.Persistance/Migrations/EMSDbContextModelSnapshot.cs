@@ -22,13 +22,28 @@ namespace EMS.Persistance.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CourseStudent", b =>
+                {
+                    b.Property<Guid>("EnrolledCoursesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("StudentsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("EnrolledCoursesId", "StudentsId");
+
+                    b.HasIndex("StudentsId");
+
+                    b.ToTable("CourseStudent");
+                });
+
             modelBuilder.Entity("EMS.Domain.Entities.Course", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreateTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Credit")
@@ -43,21 +58,18 @@ namespace EMS.Persistance.Migrations
                     b.Property<bool>("IsMandatory")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime>("LastModifiedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("TeacherId1")
+                    b.Property<Guid>("TeacherId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId1");
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Courses");
                 });
@@ -68,8 +80,13 @@ namespace EMS.Persistance.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreateTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -77,10 +94,7 @@ namespace EMS.Persistance.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsTeacher")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime>("LastModifiedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
@@ -95,18 +109,61 @@ namespace EMS.Persistance.Migrations
                     b.Property<string>("Surname")
                         .HasColumnType("text");
 
+                    b.Property<string>("UserType")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("User");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("EMS.Domain.Entities.Student", b =>
+                {
+                    b.HasBaseType("EMS.Domain.Entities.User");
+
+                    b.HasDiscriminator().HasValue("Student");
+                });
+
+            modelBuilder.Entity("EMS.Domain.Entities.Teacher", b =>
+                {
+                    b.HasBaseType("EMS.Domain.Entities.User");
+
+                    b.HasDiscriminator().HasValue("Teacher");
+                });
+
+            modelBuilder.Entity("CourseStudent", b =>
+                {
+                    b.HasOne("EMS.Domain.Entities.Course", null)
+                        .WithMany()
+                        .HasForeignKey("EnrolledCoursesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EMS.Domain.Entities.Student", null)
+                        .WithMany()
+                        .HasForeignKey("StudentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EMS.Domain.Entities.Course", b =>
                 {
-                    b.HasOne("EMS.Domain.Entities.User", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId1");
+                    b.HasOne("EMS.Domain.Entities.Teacher", "Teacher")
+                        .WithMany("CoursesTaught")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("EMS.Domain.Entities.Teacher", b =>
+                {
+                    b.Navigation("CoursesTaught");
                 });
 #pragma warning restore 612, 618
         }

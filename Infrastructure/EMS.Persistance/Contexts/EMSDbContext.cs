@@ -22,15 +22,14 @@ namespace EMS.Persistance.Contexts
             {
                 _ = data.State switch
                 {
-                    EntityState.Added => data.Entity.CreateTime = DateTime.UtcNow,
-                    EntityState.Modified => data.Entity.LastModified = DateTime.UtcNow,
-                    EntityState.Deleted => data.Entity.LastModified = DateTime.UtcNow, // Or any other logic you need
-                    _ => data.Entity.LastModified // Ensure all other states are handled, even if they do nothing
+                    EntityState.Added => data.Entity.CreatedTime = DateTime.UtcNow,
+                    EntityState.Modified => data.Entity.LastModifiedTime = DateTime.UtcNow,
+                    EntityState.Deleted => data.Entity.LastModifiedTime,
+                    _ => data.Entity.LastModifiedTime // Ensure all other states are handled
                 };
             }
 
             return base.SaveChangesAsync(cancellationToken);
         }
-
     }
 }

@@ -48,7 +48,7 @@ namespace EMS.Persistance.Repositories
             => await _context.SaveChangesAsync();
                  
 
-        public bool UpdateAsync(T model)
+        public bool Update(T model)
         {
             EntityEntry entityEntry = Table.Update(model);
             return entityEntry.State == EntityState.Modified;

@@ -43,7 +43,7 @@ namespace EMS.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(User user)
         {
-            user.Id = Guid.NewGuid();  // Ensure a new Guid is generated for the user
+            user.Id = Guid.NewGuid();
             await _userWriteRepo.AddAsync(user);
             await _userWriteRepo.SaveAsync();
 
@@ -71,7 +71,7 @@ namespace EMS.Api.Controllers
             existingUser.Phone = user.Phone;
             existingUser.UserType = user.UserType;
 
-            _userWriteRepo.UpdateAsync(existingUser);
+            _userWriteRepo.Update(existingUser);
             await _userWriteRepo.SaveAsync();
 
             return NoContent();

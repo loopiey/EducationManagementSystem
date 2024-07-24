@@ -9,7 +9,7 @@ namespace EMS.Domain.Entities
         public string? Explanation { get; set; }
         public bool IsMandatory { get; set; }
         public int Credit { get; set; }
-        public int TeacherId { get; set; }
+        public Guid TeacherId { get; set; }
         public Teacher? Teacher { get; set; } // Navigation property
         public ICollection<Student> Students { get; set; } = new List<Student>();
     }
