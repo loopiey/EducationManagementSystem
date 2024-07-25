@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMS.Application.Repositories
+namespace EMS.Application.Interfaces
 {
-    public interface IUserWriteRepository : IWriteRepository<User>
+    public interface ICourseWriteRepository : IWriteRepository<Course>
     {
     }
 }

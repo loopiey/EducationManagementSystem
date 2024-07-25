@@ -1,5 +1,4 @@
 ﻿using EMS.Domain.Common;
-using EMS.Domain.Entities;
 
 namespace EMS.Domain.Entities
 {

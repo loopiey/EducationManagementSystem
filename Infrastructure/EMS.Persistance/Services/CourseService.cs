@@ -1,31 +1,30 @@
 ﻿using EMS.API.DTOs;
-using EMS.Domain.Entities;
 using EMS.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using EMS.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace EMS.API.Controllers
+namespace EMS.Persistance.Services
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize(Roles = "Teacher")]
-    public class CoursesController : ControllerBase
+    public class CourseService : ICourseService
     {
         private readonly ICourseReadRepository _courseReadRepo;
         private readonly ICourseWriteRepository _courseWriteRepo;
 
-        public CoursesController(ICourseReadRepository courseReadRepo, ICourseWriteRepository courseWriteRepo)
+        public CourseService(ICourseReadRepository courseReadRepo, ICourseWriteRepository courseWriteRepo)
         {
             _courseReadRepo = courseReadRepo;
             _courseWriteRepo = courseWriteRepo;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Course>> CreateCourse(CreateCourseDto createCourseDto)
+        public async Task<Course> CreateCourseAsync(CreateCourseDto createCourseDto)
         {
             if (createCourseDto.Credit > 6)
             {
-                return BadRequest("Credit value cannot exceed 6.");
+                throw new InvalidOperationException("Credit value cannot exceed 6.");
             }
 
             var course = new Course
@@ -39,34 +38,30 @@ namespace EMS.API.Controllers
 
             await _courseWriteRepo.AddAsync(course);
             await _courseWriteRepo.SaveAsync();
-
-            return CreatedAtAction("GetCourse", new { id = course.Id }, course);
+            return course;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Course>> GetCourse(Guid id)
+        public async Task<Course> GetCourseByIdAsync(Guid id)
         {
             var course = await _courseReadRepo.GetByIdAsync(id.ToString());
-            if (course == null)
+            if (course == null || course.IsDeleted)
             {
-                return NotFound();
+                return null;
             }
-
-            return Ok(course);
+            return course;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCourse(Guid id, UpdateCourseDto updateCourseDto)
+        public async Task<bool> UpdateCourseAsync(Guid id, UpdateCourseDto updateCourseDto)
         {
             var existingCourse = await _courseReadRepo.GetByIdAsync(id.ToString());
-            if (existingCourse == null)
+            if (existingCourse == null || existingCourse.IsDeleted)
             {
-                return NotFound();
+                return false;
             }
 
             if (updateCourseDto.Credit > 6)
             {
-                return BadRequest("Credit value cannot exceed 6.");
+                throw new InvalidOperationException("Credit value cannot exceed 6.");
             }
 
             existingCourse.Name = updateCourseDto.Name;
@@ -77,23 +72,21 @@ namespace EMS.API.Controllers
 
             _courseWriteRepo.Update(existingCourse);
             await _courseWriteRepo.SaveAsync();
-
-            return NoContent();
+            return true;
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(Guid id)
+        public async Task<bool> DeleteCourseAsync(Guid id)
         {
             var course = await _courseReadRepo.GetByIdAsync(id.ToString());
-            if (course == null)
+            if (course == null || course.IsDeleted)
             {
-                return NotFound();
+                return false;
             }
 
-            _courseWriteRepo.Delete(course);
+            course.IsDeleted = true;
+            _courseWriteRepo.Update(course);
             await _courseWriteRepo.SaveAsync();
-
-            return NoContent();
+            return true;
         }
     }
 }

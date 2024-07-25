@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EMS.Persistance.Migrations
 {
     [DbContext(typeof(EMSDbContext))]
-    [Migration("20240724081604_authadded")]
-    partial class authadded
+    [Migration("20240725125209_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
