@@ -62,11 +62,10 @@ namespace EMS.Api.Controllers
             }
 
             // Update the properties of the existing user with the new values
-            existingUser.Name = user.Name;
-            existingUser.Surname = user.Surname;
-            existingUser.Email = user.Email;
-            existingUser.Phone = user.Phone;
-            existingUser.UserType = user.UserType;
+            user.Name = userDto.Name;
+            user.Surname = userDto.Surname;
+            user.Email = userDto.Email;
+            user.Phone = userDto.Phone;
 
             _userWriteRepo.Update(existingUser);
             await _userWriteRepo.SaveAsync();
